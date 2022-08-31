@@ -1,0 +1,31 @@
+server:
+  port: 19999
+
+spring:
+  rabbitmq:
+    host: 192.168.45.130
+    port: 5672
+    username: dk
+    password: dukun19971217...
+    virtual-host: /
+    # 消息从producer-->exchange
+    # correlated: 发布消息成功到交换器后会触发回调方法
+    # none: 禁用发布确认模式，是默认值
+    # simple:经测试有两种效果，其一效果和 CORRELATED 值一样会触发回调方法，
+    #    其二在发布消息成功后使用 rabbitTemplate 调用 waitForConfirms 或 waitForConfirmsOrDie 方法等待 broker 节点返回发送结果，
+    #     根据返回结果来判定下一步的逻辑，要注意的点是waitForConfirmsOrDie 方法如果返回 false 则会关闭 channel，则接下来无法发送消息到 broker
+    publisher-confirm-type: correlated
+    publisher-returns: true # 确认消息已发送到队列(Queue)
+    # 消费者端
+    listener:
+      simple:
+        prefetch: 0 # 表示一次从队列中获取 n 条消息。其余消息存放在队列中。  0表示无限大
+        acknowledge-mode: manual
+      direct:
+        # 消费者ack有3种模式：NONE、AUTO、MANUAL
+        # NONE: 不管消费是否成功mq都会把消息剔除，这是默认配置方式。
+        # MANUAL：手动应答
+        # AUTO：自动应答，除非MessageListener抛出异常。
+        acknowledge-mode: manual
+    template:
+      mandatory: true
